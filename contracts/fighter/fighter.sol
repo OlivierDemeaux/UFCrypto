@@ -1,17 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.0;
 
-contract fighter {
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-    uint fighterID;
+contract fighter is ERC721, Ownable{
 
-    enum FightingStyle {
-        wrestling,
-        bjj,
-        boxing,
-        kickboxing,
-        mma
-    }
+    uint fighterId;
+    //the fighting styles are "wrestling", "bjj", "boxing", "kickboxing", "mma"
 
     enum WeightClass {
         Heavyweight,
@@ -40,16 +36,14 @@ contract fighter {
 
     Fighter[] public fighters;
 
-    // bool[2][] public flags;
-    // flags.push([true,true]);
-
     uint8[9][] public selectedStyle;
 
+    event NewFighter(uint fighterId, string name, uint style);
 
     mapping (uint => address) public fighterIdToOwner;
     mapping(address => uint) ownerFighterCount;
 
-    constructor()  {
+    constructor() ERC721("UFCryptoFighters", "FIGHT") {
         // Preset default stats starting.
         //Will look for a more efficient way of doing this.
         //Starting with wrestler, theb bjj, boxing, striking, and balanced.
@@ -61,10 +55,11 @@ contract fighter {
     }
 
     function createFighter(string memory _name, uint8 _style) public returns(bool) {
-        fighters.push(Fighter(_name, 170, 18, 1, 0, fighterID, _style, selectedStyle[_style], false));
-        fighterIdToOwner[fighterID] = msg.sender;
-        ownerFighterCount[msg.sender]++;
-        fighterID++;
+        fighters.push(Fighter(_name, 170, 18, 1, 0, fighterId, _style, selectedStyle[_style], false));
+        fighterIdToOwner[fighterId] = msg.sender;
+        ownerFighterCount[msg.sender] += 1;
+        fighterId += 1;
+        emit NewFighter(fighterId, _name, _style);
         return(true);
     }
 
@@ -73,9 +68,7 @@ contract fighter {
         return(fighters[_id]);
     }
 
-    function getNumberOfFightersOwn() public view returns(uint) {
+    function getNumberOfFightersOwned() public view returns(uint) {
         return(ownerFighterCount[msg.sender]);
     }
-
-
 }
