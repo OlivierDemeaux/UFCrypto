@@ -1,4 +1,5 @@
 const { expect } = require("chai");
+const {  BigNumber } = require('ethers');
 
 describe("Fighter contract", function () {
 
@@ -68,6 +69,44 @@ describe("Fighter contract", function () {
 
      await expect(hardhatFighter.createFighter("Olivier", 1)).to.revertedWith(
        "one owner can have max 10 fighters");
+    });
+  });
+
+  describe("Train", function() {
+    let preTrainingOlivier;
+    let postTrainingOlivier;
+    let preTrainingStats;
+    let postTrainingStats;
+    beforeEach(async function () {
+      preTrainingOlivier = await hardhatFighter.fighters(0);
+      preTrainingStats = await hardhatFighter.getFighterStats(0);
+      await hardhatFighter.train(0)
+      postTrainingOlivier = await hardhatFighter.fighters(0);
+      postTrainingStats = await hardhatFighter.getFighterStats(0);
+      
+    })
+    it("Calling train() should have increased Olivier's stats per 1 each", async function () {
+      //Check that fighter stats were increased correctly each value by 1.
+      expectedArray = [12, 14, 11, 10, 3, 16, 11, 4, 3]
+      postTrainingStats =  await hardhatFighter.getFighterStats(0)
+      var i = 0;
+      while(i < 9) {
+        expect(preTrainingStats[i] + 1).to.be.equal(postTrainingStats[i]);
+        i++;
+      }
+    });
+    it("Calling train() should have increased Olivier's cooldownTime", async function () {
+      //Calling train() should have increased readyTime
+      expect(postTrainingOlivier.readyTime).to.be.above(preTrainingOlivier.readyTime);
+    });
+
+    it("Olivier's lvl should have increased", async function () {
+      //Calling train() should have called _checkLevelUp() and Olivier's lvl should have increased
+      expect(preTrainingOlivier.level).to.be.below(postTrainingOlivier.level);
+    });
+
+    it("Shouldn't be able to call train() again because of readyTime", async function () {
+      expect(hardhatFighter.train(0)).to.be.revertedWith("not ready to train again");
     });
   });
 });
