@@ -4,31 +4,33 @@ pragma solidity 0.8.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract fighter is ERC721, Ownable{
+contract fighter is ERC721, Ownable {
 
     uint fighterId;
+    uint16 public cooldownTime = uint16(5 hours);
     //the fighting styles are "wrestling", "bjj", "boxing", "kickboxing", "mma"
 
-    enum WeightClass {
-        Heavyweight,
-        LightHeavyweight,
-        Middleweight,
-        Welterweight,
-        Lightweight,
-        Featherweight,
-        Bantamweight,
-        Flyweight,
-        Strawweight
-    }
+    // enum WeightClass {
+    //     Heavyweight,
+    //     LightHeavyweight,
+    //     Middleweight,
+    //     Welterweight,
+    //     Lightweight,
+    //     Featherweight,
+    //     Bantamweight,
+    //     Flyweight,
+    //     Strawweight
+    // }
 
     struct Fighter {
         string name;
         uint8 weight;
         uint8 age;
         uint8 level;
-        uint32 xp;
-        uint id;
         uint8 fightingStyle;
+        uint32 xp;
+        uint readyTime;
+        uint id;
         // by order: strengh, stamina, health, speed, striking, grappling, wrestling, boxing, kicking
         uint8[9] stats;
         bool injured;
@@ -43,7 +45,12 @@ contract fighter is ERC721, Ownable{
     mapping (uint => address) public fighterIdToOwner;
     mapping(address => uint) ownerFighterCount;
 
-    constructor() ERC721("UFCryptoFighters", "FIGHT") {
+    modifier onlyOwnerOf(uint _fighterId) {
+        require(msg.sender == fighterIdToOwner[_fighterId]);
+        _;
+  }
+
+    constructor() ERC721("UFCrypto Fighters", "FIGHT") {
         // Preset default stats starting.
         //Will look for a more efficient way of doing this.
         //Starting with wrestler, theb bjj, boxing, striking, and balanced.
@@ -55,7 +62,8 @@ contract fighter is ERC721, Ownable{
     }
 
     function createFighter(string memory _name, uint8 _style) public returns(bool) {
-        fighters.push(Fighter(_name, 170, 18, 1, 0, fighterId, _style, selectedStyle[_style], false));
+        require(getNumberOfFightersOwned() < 10, "one owner can have max 10 fighters");
+        fighters.push(Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, fighterId, selectedStyle[_style], false));
         fighterIdToOwner[fighterId] = msg.sender;
         ownerFighterCount[msg.sender] += 1;
         fighterId += 1;
@@ -67,6 +75,39 @@ contract fighter is ERC721, Ownable{
     function getFighter(uint _id) public view returns(Fighter memory){
         return(fighters[_id]);
     }
+
+    function _levelUp(uint _fighterId) internal {
+        fighters[_fighterId].level += 1;
+    }
+
+    function train(uint _fighterId) public onlyOwnerOf(_fighterId) {
+        require(_isReady(_fighterId), "not ready to train again");
+        require(!fighters[_fighterId].injured, "can't train while injured");
+        for(uint i = 0; i < 9; i++) {
+            fighters[_fighterId].stats[i]++;
+        }
+        fighters[_fighterId].xp += 10;
+        _checkLevelUp(_fighterId);
+        _triggerCooldown(_fighterId);
+    }
+
+    function _isReady(uint _fighterId) internal view returns (bool) {
+    return (fighters[_fighterId].readyTime <= block.timestamp);
+    }
+
+    function _checkLevelUp(uint _fighterId) private {
+        if(fighters[_fighterId].xp > 8*(fighters[_fighterId].level**3)) {
+            fighters[_fighterId].level += 1;
+        }
+    }
+
+    function _triggerCooldown(uint _fighterId) internal {
+        fighters[_fighterId].readyTime = block.timestamp + cooldownTime;
+    }
+
+    function getFighterStats(uint _fighterId) public view returns(uint8[9] memory) {
+        return(fighters[_fighterId].stats);
+    } 
 
     function getNumberOfFightersOwned() public view returns(uint) {
         return(ownerFighterCount[msg.sender]);
