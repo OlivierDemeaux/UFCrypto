@@ -92,7 +92,11 @@ contract fighter is ERC721, Ownable {
     }
 
     function _isReady(uint _fighterId) internal view returns (bool) {
-    return (fighters[_fighterId].readyTime <= block.timestamp);
+        return (fighters[_fighterId].readyTime <= block.timestamp);
+    }
+
+    function _isInjured(uint _fighterId) internal view returns (bool) {
+        return (fighters[_fighterId].injured)
     }
 
     function _checkLevelUp(uint _fighterId) private {
@@ -103,6 +107,11 @@ contract fighter is ERC721, Ownable {
 
     function _triggerCooldown(uint _fighterId) internal {
         fighters[_fighterId].readyTime = block.timestamp + cooldownTime;
+    }
+
+    //Should only ever be called after a "_isInjured()" check
+    function _gotInjured(uint _fighterId) internal {
+        fighters[_fighterId].injured = false;
     }
 
     function getFighterStats(uint _fighterId) public view returns(uint8[9] memory) {
