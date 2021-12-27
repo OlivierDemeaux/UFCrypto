@@ -38,7 +38,7 @@ describe("Fighter contract", function () {
       expect(olivier[3]).to.be.equal(1);
       expect(olivier[4]).to.be.equal(1);
       expect(olivier[5]).to.be.equal(0);
-      expect(olivier[8]).to.be.equal(false);
+      expect(olivier[10]).to.be.equal(false);
     })
 
     it("Fighter created should have the correct stats", async function() {
