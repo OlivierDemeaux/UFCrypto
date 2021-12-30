@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./fighterhelper.sol";
 
 contract fighter is FighterHelper {
@@ -40,6 +39,4 @@ contract fighter is FighterHelper {
         randNonce++;
         return uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce))) % _modulus;
     }
-
-
 }

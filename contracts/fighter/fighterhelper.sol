@@ -6,7 +6,7 @@ import "./fighterfactory.sol";
 contract FighterHelper is FighterFactory {
     
     modifier onlyOwnerOf(uint _fighterId) {
-        require(msg.sender == fighterIdToOwner[_fighterId]);
+        require(msg.sender == ownerOf(_fighterId));
         _;
   }
     function _levelUp(uint _fighterId) internal {
@@ -44,5 +44,4 @@ contract FighterHelper is FighterFactory {
             fighters[_fighterId].level += 1;
         }
     }
-
 }

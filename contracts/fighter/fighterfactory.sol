@@ -2,10 +2,11 @@
 pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract FighterFactory is Ownable {
 
-    uint fighterId;
+contract FighterFactory is Ownable, ERC721Enumerable{
+
     uint16 public cooldownTime = uint16(5 hours);
 
      struct Fighter {
@@ -26,13 +27,12 @@ contract FighterFactory is Ownable {
 
     Fighter[] public fighters;
     mapping (uint => address) public fighterIdToOwner;
-    mapping(address => uint) ownerFighterCount;
 
     uint8[9][] public selectedStyle;
     
     event NewFighter(uint fighterId, string name, uint style);
 
-    constructor() {
+    constructor() ERC721("UFCrypto Fighters", "FGHT") {
         // Preset default stats starting.
         //Will look for a more efficient way of doing this.
         //Starting with wrestler, theb bjj, boxing, striking, and balanced.
@@ -45,15 +45,13 @@ contract FighterFactory is Ownable {
 
     function createFighter(string memory _name, uint8 _style) public returns(bool) {
         require(getNumberOfFightersOwned() < 10, "one owner can have max 10 fighters");
+        uint fighterId = totalSupply();
         fighters.push(Fighter(_name, 170, 18, 1, _style, 0, 0, 0, block.timestamp, fighterId, selectedStyle[_style], false));
-        fighterIdToOwner[fighterId] = msg.sender;
-        ownerFighterCount[msg.sender] += 1;
-        fighterId += 1;
-        emit NewFighter(fighterId, _name, _style);
+        _mint(msg.sender, fighterId);
         return(true);
     }
 
     function getNumberOfFightersOwned() public view returns(uint) {
-        return(ownerFighterCount[msg.sender]);
+        return(balanceOf(msg.sender));
     }
 }
