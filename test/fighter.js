@@ -11,7 +11,7 @@ describe("Fighter contract", function () {
 
   beforeEach(async function () {
     [owner, addr1, addr2] = await ethers.getSigners();
-    Fighter = await ethers.getContractFactory("fighter");
+    Fighter = await ethers.getContractFactory("Fighter");
 
     hardhatFighter = await Fighter.deploy();
     await hardhatFighter.createFighter("Olivier", 1);
