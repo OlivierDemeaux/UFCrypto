@@ -1,0 +1,27 @@
+{
+    "name": "UFCrypto",
+    "image": "QmbJoCX7eKVNPFmBj2BrwwdHc6QyMXdpTBFtd7nPSTuPCj",
+    "description": "UFCrypto Fighter Id 0",
+    "attributes": [
+      {
+        "trait_type": "Style",
+        "value": "BJJ"
+      },
+      {
+        "trait_type": "Head",
+        "value": "hair"
+      },
+      {
+        "trait_type": "beard",
+        "value": "medium"
+      },
+      {
+          "trait_type": "pants",
+          "value": "shorts"
+      },
+      {
+          "trait_type": "pantsColor",
+          "value": "green"
+      }
+    ]
+  }

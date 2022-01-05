@@ -26,13 +26,16 @@ contract FighterFactory is Ownable, ERC721Enumerable{
     }
 
     Fighter[] public fighters;
-    mapping (uint => address) public fighterIdToOwner;
+    mapping (uint256 => address) public fighterIdToOwner;
+
+    // Optional mapping for token URIs
+    mapping (uint256 => string) private _tokenURIs;
 
     uint8[9][] public selectedStyle;
     
     event NewFighter(uint fighterId, string name, uint style);
 
-    constructor() ERC721("UFCrypto Fighters", "FGHT") {
+    constructor() ERC721("UFCrypto Fighters", "FGHTER") {
         // Preset default stats starting.
         //Will look for a more efficient way of doing this.
         //Starting with wrestler, theb bjj, boxing, striking, and balanced.
@@ -48,6 +51,8 @@ contract FighterFactory is Ownable, ERC721Enumerable{
         uint fighterId = totalSupply();
         fighters.push(Fighter(_name, 170, 18, 1, _style, 0, 0, 0, block.timestamp, fighterId, selectedStyle[_style], false));
         _mint(msg.sender, fighterId);
+        _tokenURIs[fighterId] = "https://gateway.pinata.cloud/ipfs/QmVLVq6i9Jrok3KWVwZL1Wwmm4beKHmdSjTxajfoBKCVsF";
+
         return(true);
     }
 

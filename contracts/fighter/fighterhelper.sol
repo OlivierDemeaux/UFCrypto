@@ -6,7 +6,7 @@ import "./fighterfactory.sol";
 contract FighterHelper is FighterFactory {
     
     modifier onlyOwnerOf(uint _fighterId) {
-        require(msg.sender == ownerOf(_fighterId));
+        require(msg.sender == ownerOf(_fighterId), "Not the rightfull owner of this fighter");
         _;
   }
     function _levelUp(uint _fighterId) internal {
@@ -43,5 +43,9 @@ contract FighterHelper is FighterFactory {
         if(fighters[_fighterId].xp > 8*(fighters[_fighterId].level**3)) {
             fighters[_fighterId].level += 1;
         }
+    }
+
+    function transferFighter(address _to, uint _fighterId) public onlyOwnerOf(_fighterId) {
+        _transfer(msg.sender, _to, _fighterId);
     }
 }

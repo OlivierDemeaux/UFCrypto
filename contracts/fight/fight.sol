@@ -5,7 +5,7 @@ import "../fighter/fighter.sol";
 
 contract Fight is Fighter {
 
-    struct Fight {
-        
-    }
+    // struct Fight {
+
+    // }
 }
