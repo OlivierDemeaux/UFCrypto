@@ -25,8 +25,12 @@ describe("Fighter contract", function () {
 
   describe("Fighter Creation", function() {
     it("Should have created one Fighter", async function() {
-      expect(await hardhatFighter.getNumberOfFightersOwned()).to.equal(1);
+      expect(await hardhatFighter.getNumberOfFightersOwned()).to.equal(1);  
     });
+
+    it("Should have the correct URI", async function () {
+      expect(await hardhatFighter.getFighterURI(0)).to.be.equal("https://gateway.pinata.cloud/ipfs/QmVLVq6i9Jrok3KWVwZL1Wwmm4beKHmdSjTxajfoBKCVsF");
+    })
 
     it("Fighter created should have the correct caracteristics", async function() {
       const olivier = await hardhatFighter.fighters(0);

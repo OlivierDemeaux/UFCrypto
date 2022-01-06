@@ -4,13 +4,23 @@ pragma solidity 0.8.0;
 import "./fighterfactory.sol";
 
 contract FighterHelper is FighterFactory {
+
+    event GotInjured(uint fighterId);
+    event IncreasedLevel(uint fighterId, uint newLevel);    
     
     modifier onlyOwnerOf(uint _fighterId) {
         require(msg.sender == ownerOf(_fighterId), "Not the rightfull owner of this fighter");
         _;
   }
+
+    modifier aboveLevel(uint _level, uint _fighterId) {
+    require(fighters[_fighterId].level >= _level, "Can't do this with your current level");
+    _;
+  }
+
     function _levelUp(uint _fighterId) internal {
         fighters[_fighterId].level += 1;
+        emit IncreasedLevel(_fighterId, fighters[_fighterId].level);
     }
 
     function _triggerCooldown(uint _fighterId) internal {
@@ -25,6 +35,7 @@ contract FighterHelper is FighterFactory {
     //Should only ever be called after a "_isInjured()" check
     function _gotInjured(uint _fighterId) internal {
         fighters[_fighterId].injured = false;
+        emit GotInjured(_fighterId);
     }
 
     function getFighterStats(uint _fighterId) public view returns(uint8[9] memory) {

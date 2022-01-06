@@ -56,6 +56,10 @@ contract FighterFactory is Ownable, ERC721Enumerable{
         return(true);
     }
 
+    function getFighterURI(uint _fighterId) public view returns(string memory) {
+        return(_tokenURIs[_fighterId]);
+    }
+
     function getNumberOfFightersOwned() public view returns(uint) {
         return(balanceOf(msg.sender));
     }
