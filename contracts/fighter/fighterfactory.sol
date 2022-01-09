@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 contract FighterFactory is Ownable, ERC721Enumerable{
 
     uint16 public cooldownTime = uint16(5 hours);
+    enum pro_status {hopeful, amateur, semiPro, professional, retired }
+
 
      struct Fighter {
         string name;
@@ -23,6 +25,7 @@ contract FighterFactory is Ownable, ERC721Enumerable{
         // fightRecord is an array of 6 values, 3 pairs of win - losses for amateur, semi-pro and pro fighting career.
         uint8[6] fightRecord;
         bool injured;
+        pro_status status;
     }
 
     Fighter[] public fighters;
@@ -49,7 +52,7 @@ contract FighterFactory is Ownable, ERC721Enumerable{
     function createFighter(string memory _name, uint8 _style) public returns(bool) {
         require(balanceOf(msg.sender) < 10, "one owner can have max 10 fighters");
         uint fighterId = totalSupply();
-        fighters.push(Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, fighterId, selectedStyle[_style], [0,0,0,0,0,0], false));
+        fighters.push(Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, fighterId, selectedStyle[_style], [0,0,0,0,0,0], false, pro_status.hopeful));
         _mint(msg.sender, fighterId);
         _tokenURIs[fighterId] = "https://gateway.pinata.cloud/ipfs/QmVLVq6i9Jrok3KWVwZL1Wwmm4beKHmdSjTxajfoBKCVsF";
 

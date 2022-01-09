@@ -51,6 +51,20 @@ contract FighterHelper is FighterFactory {
         return(fighters[_fighterId].stats);
     }
 
+    function getFighterStatus(uint _fighterId) public view returns(pro_status) {
+        return(fighters[_fighterId].status);
+    }
+
+    function retire(uint _fighterId) public onlyOwnerOf(_fighterId) {
+        fighters[_fighterId].status = pro_status(4);
+    }
+
+    function checkIfRetired(uint _fighterId) public view returns(bool) {
+        if (fighters[_fighterId].status == pro_status(4))
+            return(true);
+        return(false);
+    }
+
     function _isReady(uint _fighterId) internal view returns (bool) {
         return (fighters[_fighterId].readyTime <= block.timestamp);
     }

@@ -41,6 +41,7 @@ describe("Fighter contract", function () {
       expect(olivier[4]).to.be.equal(1);
       expect(olivier[5]).to.be.equal(0);
       expect(olivier.injured).to.be.equal(false);
+      expect(olivier.status).to.be.equal(0);
     })
 
     it("Fighter created should have the correct stats", async function() {
@@ -60,8 +61,29 @@ describe("Fighter contract", function () {
     });
 
     it("Create fighter and check event and process", async function() {
-      // console.log(await hardhatFighter.createFighter("Olivier2", 1));
       expect(await hardhatFighter.createFighter("Olivier2", 1)).to.emit(hardhatFighter, "Transfer");
+    });
+  });
+
+  describe("Fighter status checks", function () {
+    it("Fighter should be created as a hopeful", async function() {
+      const olivier = await hardhatFighter.fighters(0);
+      expect(olivier.status).to.be.equal(0);
+    });
+    it("Fighter should be retired after calling retire()", async function() {
+      await hardhatFighter.retire(0);
+      const olivier = await hardhatFighter.fighters(0);
+      expect(olivier.status).to.be.equal(4);
+    });
+    it("Should not be able to retire a fighter that not owned", async function() {
+      await expect(hardhatFighter.connect(addr1).retire(0)).to.revertedWith("Not the rightfull owner of this fighter");
+      const olivier = await hardhatFighter.fighters(0);
+      expect(olivier.status).to.be.equal(0);
+    });
+    it("Check the checkIfRetired()", async function() {
+      expect(await hardhatFighter.checkIfRetired(0)).to.be.equal(false);
+      await hardhatFighter.retire(0);
+      expect(await hardhatFighter.checkIfRetired(0)).to.be.equal(true);
     });
   });
 
