@@ -16,12 +16,12 @@ contract FighterFactory is Ownable, ERC721Enumerable{
         uint8 level;
         uint8 fightingStyle;
         uint32 xp;
-        uint32 winCount;
-        uint32 lossCount;
         uint readyTime;
         uint id;
         // by order: strengh, stamina, health, speed, striking, grappling, wrestling, boxing, kicking
         uint8[9] stats;
+        // fightRecord is an array of 6 values, 3 pairs of win - losses for amateur, semi-pro and pro fighting career.
+        uint8[6] fightRecord;
         bool injured;
     }
 
@@ -47,9 +47,9 @@ contract FighterFactory is Ownable, ERC721Enumerable{
     }
 
     function createFighter(string memory _name, uint8 _style) public returns(bool) {
-        require(getNumberOfFightersOwned() < 10, "one owner can have max 10 fighters");
+        require(balanceOf(msg.sender) < 10, "one owner can have max 10 fighters");
         uint fighterId = totalSupply();
-        fighters.push(Fighter(_name, 170, 18, 1, _style, 0, 0, 0, block.timestamp, fighterId, selectedStyle[_style], false));
+        fighters.push(Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, fighterId, selectedStyle[_style], [0,0,0,0,0,0], false));
         _mint(msg.sender, fighterId);
         _tokenURIs[fighterId] = "https://gateway.pinata.cloud/ipfs/QmVLVq6i9Jrok3KWVwZL1Wwmm4beKHmdSjTxajfoBKCVsF";
 
@@ -58,9 +58,5 @@ contract FighterFactory is Ownable, ERC721Enumerable{
 
     function getFighterURI(uint _fighterId) public view returns(string memory) {
         return(_tokenURIs[_fighterId]);
-    }
-
-    function getNumberOfFightersOwned() public view returns(uint) {
-        return(balanceOf(msg.sender));
     }
 }

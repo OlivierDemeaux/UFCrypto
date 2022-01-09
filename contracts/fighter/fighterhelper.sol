@@ -6,7 +6,7 @@ import "./fighterfactory.sol";
 contract FighterHelper is FighterFactory {
 
     event GotInjured(uint fighterId);
-    event IncreasedLevel(uint fighterId, uint newLevel);    
+    event IncreasedLevel(uint fighterId, uint newLevel);
     
     modifier onlyOwnerOf(uint _fighterId) {
         require(msg.sender == ownerOf(_fighterId), "Not the rightfull owner of this fighter");
@@ -14,9 +14,14 @@ contract FighterHelper is FighterFactory {
   }
 
     modifier aboveLevel(uint _level, uint _fighterId) {
-    require(fighters[_fighterId].level >= _level, "Can't do this with your current level");
-    _;
+        require(fighters[_fighterId].level >= _level, "Can't do this with your current level");
+        _;
   }
+
+    modifier notSameOwner(uint _firstFighterId, uint _secondFighterId) {
+        require(ownerOf(_firstFighterId) != ownerOf(_secondFighterId));
+        _;
+    }
 
     function _levelUp(uint _fighterId) internal {
         fighters[_fighterId].level += 1;
@@ -30,6 +35,10 @@ contract FighterHelper is FighterFactory {
     //gets a fighter through ID.
     function getFighter(uint _id) public view returns(Fighter memory){
         return(fighters[_id]);
+    }
+
+    function getFightersRecord(uint _id) public view returns(uint8[6] memory) {
+        return(fighters[_id].fightRecord);
     }
 
     //Should only ever be called after a "_isInjured()" check

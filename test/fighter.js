@@ -25,7 +25,7 @@ describe("Fighter contract", function () {
 
   describe("Fighter Creation", function() {
     it("Should have created one Fighter", async function() {
-      expect(await hardhatFighter.getNumberOfFightersOwned()).to.equal(1);  
+      expect(await hardhatFighter.balanceOf(owner.address)).to.equal(1);  
     });
 
     it("Should have the correct URI", async function () {
@@ -40,7 +40,7 @@ describe("Fighter contract", function () {
       expect(olivier[3]).to.be.equal(1);
       expect(olivier[4]).to.be.equal(1);
       expect(olivier[5]).to.be.equal(0);
-      expect(olivier[10]).to.be.equal(false);
+      expect(olivier.injured).to.be.equal(false);
     })
 
     it("Fighter created should have the correct stats", async function() {
@@ -120,12 +120,12 @@ describe("Fighter contract", function () {
   describe("Transfer fighter and ERC721 functions", function() {
     it("Transfer figher to another address", async function () {
       //owner should have one fighter and addr1 should have 0
-      expect( await hardhatFighter.getNumberOfFightersOwned()).to.equal(1);
-      expect( await hardhatFighter.connect(addr1).getNumberOfFightersOwned()).to.equal(0);
+      expect( await hardhatFighter.balanceOf(owner.address)).to.equal(1);
+      expect( await hardhatFighter.connect(addr1).balanceOf(addr1.address)).to.equal(0);
       hardhatFighter.transferFighter(addr1.address, 0);
       //owner transfered his fighter to addr1 so owner should have 0 fighter and addr1 should have 1.
-      expect( await hardhatFighter.getNumberOfFightersOwned()).to.equal(0);
-      expect( await hardhatFighter.connect(addr1).getNumberOfFightersOwned()).to.equal(1);
+      expect( await hardhatFighter.balanceOf(owner.address)).to.equal(0);
+      expect( await hardhatFighter.connect(addr1).balanceOf(addr1.address)).to.equal(1);
     });
 
     it("Addr1 should not be able to transfer fighter because not the owner", async function() {
