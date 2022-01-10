@@ -45,7 +45,7 @@ contract FighterHelper is FighterFactory {
 
     //Should only ever be called after a "_isInjured()" check
     function _gotInjured(uint _fighterId) internal {
-        fighters[_fighterId].injured = false;
+        fighters[_fighterId].injured = true;
         emit GotInjured(_fighterId);
     }
 
@@ -85,7 +85,7 @@ contract FighterHelper is FighterFactory {
         _transfer(msg.sender, _to, _fighterId);
     }
 
-    function getRand(uint8 _limit) internal returns(uint8) {
+    function getRand() internal returns(uint) {
         return(randMod(100));
     }
 
