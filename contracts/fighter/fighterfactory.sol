@@ -28,7 +28,7 @@ contract FighterFactory is Ownable, ERC721Enumerable{
         pro_status status;
     }
 
-    Fighter[] public fighters;
+    mapping (uint256 => Fighter) public fighters;
     mapping (uint256 => address) public fighterIdToOwner;
 
     // Optional mapping for token URIs
@@ -52,7 +52,8 @@ contract FighterFactory is Ownable, ERC721Enumerable{
     function createFighter(string memory _name, uint8 _style) public returns(bool) {
         require(balanceOf(msg.sender) < 10, "one owner can have max 10 fighters");
         uint fighterId = totalSupply();
-        fighters.push(Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, fighterId, selectedStyle[_style], [0,0,0,0,0,0], false, pro_status.hopeful));
+        fighters[fighterId] = Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, fighterId, selectedStyle[_style], [0,0,0,0,0,0], false, pro_status.hopeful);
+        // fighters.push(Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, fighterId, selectedStyle[_style], [0,0,0,0,0,0], false, pro_status.hopeful));
         _mint(msg.sender, fighterId);
         _tokenURIs[fighterId] = "https://gateway.pinata.cloud/ipfs/QmVLVq6i9Jrok3KWVwZL1Wwmm4beKHmdSjTxajfoBKCVsF";
 

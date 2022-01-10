@@ -21,6 +21,15 @@ describe("Test fight logic", function () {
         expect(await hardhatFighter.ownerOf(1)).to.be.equal(addr1.address);
     });
 
+    it("check that the fight can't happen if one fighter is retired", async function() {
+        let olivier = await hardhatFighter.fighters(0);
+        expect(olivier.status).to.be.equal(0);
+        await hardhatFighter.retire(0);
+        olivier = await hardhatFighter.fighters(0);
+        expect(olivier.status).to.be.equal(4);
+        expect(hardhatFighter.fight(0, 1)).to.be.revertedWith("at least one of the fighters is retired and can't compete");
+    });
+
     it("check pre fight record and post fight when Olivier wins and GSP losses", async function() {
         const oliviersRecord = await hardhatFighter.getFightersRecord(0);
         const gspsRecord = await hardhatFighter.getFightersRecord(1);
