@@ -40,5 +40,8 @@ describe("Test fight logic", function () {
         const gspsRecordPostFight = await hardhatFighter.getFightersRecord(1); 
         expect(oliviersRecordPostFight[0]).to.be.equal(1);
         expect(gspsRecordPostFight[1]).to.be.equal(1);
+        console.log(await hardhatFighter.fighters[1].injured);
+        let gspIsInjured = await hardhatFighter.fighters[1].injured;
+        expect(gspIsInjured).to.be.equal(true);
     });
 });

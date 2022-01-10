@@ -5,6 +5,8 @@ import "./fighterfactory.sol";
 
 contract FighterHelper is FighterFactory {
 
+    uint randNonce = 0;
+
     event GotInjured(uint fighterId);
     event IncreasedLevel(uint fighterId, uint newLevel);
     
@@ -81,5 +83,14 @@ contract FighterHelper is FighterFactory {
 
     function transferFighter(address _to, uint _fighterId) public onlyOwnerOf(_fighterId) {
         _transfer(msg.sender, _to, _fighterId);
+    }
+
+    function getRand(uint8 _limit) internal returns(uint8) {
+        return(randMod(100));
+    }
+
+    function randMod(uint _modulus) internal returns(uint) {
+        randNonce++;
+        return uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce))) % _modulus;
     }
 }

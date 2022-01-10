@@ -17,8 +17,6 @@ contract Fighter is FighterHelper {
     //     Strawweight
     // }
 
-    uint randNonce = 0;
-
     function train(uint _fighterId) public onlyOwnerOf(_fighterId) {
         require(_isReady(_fighterId), "not ready to train again");
         require(!_isInjured(_fighterId), "can't train while injured");
@@ -30,13 +28,7 @@ contract Fighter is FighterHelper {
         _checkLevelUp(_fighterId);
         _triggerCooldown(_fighterId);
 
-        uint rand = randMod(100);
-        if (rand <= 3)
+        if (getRand() <= 3)
             _gotInjured(_fighterId);
-    }
-
-    function randMod(uint _modulus) internal returns(uint) {
-        randNonce++;
-        return uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce))) % _modulus;
     }
 }
