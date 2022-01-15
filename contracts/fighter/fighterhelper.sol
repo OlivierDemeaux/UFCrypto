@@ -11,7 +11,7 @@ contract FighterHelper is FighterFactory {
     event IncreasedLevel(uint fighterId, uint newLevel);
     
     modifier onlyOwnerOf(uint _fighterId) {
-        require(msg.sender == ownerOf(_fighterId), "Not the rightfull owner of this fighter");
+        require(balanceOf(msg.sender, _fighterId) == 1, "Not the rightfull owner of this fighter");
         _;
   }
 
@@ -21,7 +21,7 @@ contract FighterHelper is FighterFactory {
   }
 
     modifier notSameOwner(uint _firstFighterId, uint _secondFighterId) {
-        require(ownerOf(_firstFighterId) != ownerOf(_secondFighterId));
+        require(balanceOf(msg.sender, _firstFighterId) != balanceOf(msg.sender, _secondFighterId));
         _;
     }
 
@@ -82,7 +82,7 @@ contract FighterHelper is FighterFactory {
     }
 
     function transferFighter(address _to, uint _fighterId) public onlyOwnerOf(_fighterId) {
-        _transfer(msg.sender, _to, _fighterId);
+        safeTransferFrom(msg.sender, _to, _fighterId, 1, "");
     }
 
     function getRand() internal returns(uint) {

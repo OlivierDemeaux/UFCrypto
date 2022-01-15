@@ -2,11 +2,19 @@
 pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 
-contract FighterFactory is Ownable, ERC721Enumerable{
+contract FighterFactory is Ownable, ERC1155 {
 
+    using Counters for Counters.Counter;
+
+    //Id of the next NFT to mint
+    Counters.Counter private _fighterCounter;
+
+    uint256 public constant FGHT = 0;
     uint16 public cooldownTime = uint16(5 hours);
     enum pro_status {hopeful, amateur, semiPro, professional, retired }
 
@@ -30,6 +38,7 @@ contract FighterFactory is Ownable, ERC721Enumerable{
 
     mapping (uint256 => Fighter) public fighters;
     mapping (uint256 => address) public fighterIdToOwner;
+    mapping (address => uint) public numberFighterOwned;
 
     // Optional mapping for token URIs
     mapping (uint256 => string) private _tokenURIs;
@@ -38,7 +47,9 @@ contract FighterFactory is Ownable, ERC721Enumerable{
     
     event NewFighter(uint fighterId, string name, uint style);
 
-    constructor() ERC721("UFCrypto Fighters", "FGHTER") {
+    constructor() ERC1155("https://gateway.pinata.cloud/ipfs/QmbU522KoakHNjMxE8qdR2gyP4cR5SBytkjVURsEeHQuAK/{id}.json") {
+        _mint(msg.sender, _fighterCounter.current(), 10**18, "");
+        _fighterCounter.increment();
         // Preset default stats starting.
         //Will look for a more efficient way of doing this.
         //Starting with wrestler, theb bjj, boxing, striking, and balanced.
@@ -47,20 +58,27 @@ contract FighterFactory is Ownable, ERC721Enumerable{
         selectedStyle.push([9, 12, 10, 12, 11, 1, 2, 15, 3]); //boxing heavy start
         selectedStyle.push([8, 10, 10, 11, 13, 1, 1, 11, 10]); //striking heavy start
         selectedStyle.push([8, 9, 10, 9, 8, 8, 8, 8, 8]); //balanced start
+
     }
 
     function createFighter(string memory _name, uint8 _style) public returns(bool) {
-        require(balanceOf(msg.sender) < 10, "one owner can have max 10 fighters");
-        uint fighterId = totalSupply();
-        fighters[fighterId] = Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, fighterId, selectedStyle[_style], [0,0,0,0,0,0], false, pro_status.hopeful);
+        require(numberFighterOwned[msg.sender] < 10, "one owner can have max 10 fighters");
+        uint _fighterId = _fighterCounter.current();
+        fighters[_fighterId] = Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, _fighterId, selectedStyle[_style], [0,0,0,0,0,0], false, pro_status.hopeful);
         // fighters.push(Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, fighterId, selectedStyle[_style], [0,0,0,0,0,0], false, pro_status.hopeful));
-        _mint(msg.sender, fighterId);
-        _tokenURIs[fighterId] = "https://gateway.pinata.cloud/ipfs/QmVLVq6i9Jrok3KWVwZL1Wwmm4beKHmdSjTxajfoBKCVsF";
+        _mint(msg.sender, _fighterId, 1, "");
+        _fighterCounter.increment();
+        numberFighterOwned[msg.sender] += 1;
 
         return(true);
     }
 
-    function getFighterURI(uint _fighterId) public view returns(string memory) {
-        return(_tokenURIs[_fighterId]);
+    function getFighterURI(uint _fighterId) public pure returns(string memory) {
+        return(string(abi.encodePacked(
+            "https://gateway.pinata.cloud/ipfs/QmbU522KoakHNjMxE8qdR2gyP4cR5SBytkjVURsEeHQuAK/",
+            Strings.toString(_fighterId),
+            ".json"
+            ))
+        );
     }
 }
