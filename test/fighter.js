@@ -25,15 +25,15 @@ describe("Fighter contract", function () {
 
   describe("Fighter Creation", function() {
     it("Should have created one Fighter", async function() {
-      expect(await hardhatFighter.balanceOf(owner.address)).to.equal(1);  
+      expect(await hardhatFighter.balanceOf(owner.address, 1)).to.equal(1);  
     });
 
     it("Should have the correct URI", async function () {
-      expect(await hardhatFighter.getFighterURI(0)).to.be.equal("https://gateway.pinata.cloud/ipfs/QmVLVq6i9Jrok3KWVwZL1Wwmm4beKHmdSjTxajfoBKCVsF");
+      expect(await hardhatFighter.getFighterURI(1)).to.be.equal("https://gateway.pinata.cloud/ipfs/QmbU522KoakHNjMxE8qdR2gyP4cR5SBytkjVURsEeHQuAK/1.json");
     })
 
     it("Fighter created should have the correct caracteristics", async function() {
-      const olivier = await hardhatFighter.fighters(0);
+      const olivier = await hardhatFighter.fighters(1);
       expect(olivier[0]).to.be.equal("Olivier");
       expect(olivier[1]).to.be.equal(170);
       expect(olivier[2]).to.be.equal(18);
@@ -45,7 +45,7 @@ describe("Fighter contract", function () {
     })
 
     it("Fighter created should have the correct stats", async function() {
-      const olivierStats =  await hardhatFighter.getFighterStats(0)
+      const olivierStats =  await hardhatFighter.getFighterStats(1)
 
       //Check that fighter stats were initialized correctly.
       expectedArray = [11, 13, 10, 9, 2, 15, 10, 3, 2]
@@ -61,29 +61,29 @@ describe("Fighter contract", function () {
     });
 
     it("Create fighter and check event and process", async function() {
-      expect(await hardhatFighter.createFighter("Olivier2", 1)).to.emit(hardhatFighter, "Transfer");
+      expect(await hardhatFighter.createFighter("Olivier2", 1)).to.emit(hardhatFighter, "TransferSingle");
     });
   });
 
   describe("Fighter status checks", function () {
     it("Fighter should be created as a hopeful", async function() {
-      const olivier = await hardhatFighter.fighters(0);
+      const olivier = await hardhatFighter.fighters(1);
       expect(olivier.status).to.be.equal(0);
     });
     it("Fighter should be retired after calling retire()", async function() {
-      await hardhatFighter.retire(0);
-      const olivier = await hardhatFighter.fighters(0);
+      await hardhatFighter.retire(1);
+      const olivier = await hardhatFighter.fighters(1);
       expect(olivier.status).to.be.equal(4);
     });
     it("Should not be able to retire a fighter that not owned", async function() {
       await expect(hardhatFighter.connect(addr1).retire(0)).to.revertedWith("Not the rightfull owner of this fighter");
-      const olivier = await hardhatFighter.fighters(0);
+      const olivier = await hardhatFighter.fighters(1);
       expect(olivier.status).to.be.equal(0);
     });
     it("Check the checkIfRetired()", async function() {
-      expect(await hardhatFighter.checkIfRetired(0)).to.be.equal(false);
-      await hardhatFighter.retire(0);
-      expect(await hardhatFighter.checkIfRetired(0)).to.be.equal(true);
+      expect(await hardhatFighter.checkIfRetired(1)).to.be.equal(false);
+      await hardhatFighter.retire(1);
+      expect(await hardhatFighter.checkIfRetired(1)).to.be.equal(true);
     });
   });
 
@@ -107,17 +107,17 @@ describe("Fighter contract", function () {
     let preTrainingStats;
     let postTrainingStats;
     beforeEach(async function () {
-      preTrainingOlivier = await hardhatFighter.fighters(0);
-      preTrainingStats = await hardhatFighter.getFighterStats(0);
-      await hardhatFighter.train(0)
-      postTrainingOlivier = await hardhatFighter.fighters(0);
-      postTrainingStats = await hardhatFighter.getFighterStats(0);
+      preTrainingOlivier = await hardhatFighter.fighters(1);
+      preTrainingStats = await hardhatFighter.getFighterStats(1);
+      await hardhatFighter.train(1)
+      postTrainingOlivier = await hardhatFighter.fighters(1);
+      postTrainingStats = await hardhatFighter.getFighterStats(1);
       
     })
     it("Calling train() should have increased Olivier's stats per 1 each", async function () {
       //Check that fighter stats were increased correctly each value by 1.
       expectedArray = [12, 14, 11, 10, 3, 16, 11, 4, 3]
-      postTrainingStats =  await hardhatFighter.getFighterStats(0)
+      postTrainingStats =  await hardhatFighter.getFighterStats(1)
       var i = 0;
       while(i < 9) {
         expect(preTrainingStats[i] + 1).to.be.equal(postTrainingStats[i]);
@@ -135,23 +135,23 @@ describe("Fighter contract", function () {
     });
 
     it("Shouldn't be able to call train() again because of readyTime", function () {
-      expect(hardhatFighter.train(0)).to.be.revertedWith("not ready to train again");
+      expect(hardhatFighter.train(1)).to.be.revertedWith("not ready to train again");
     });
   });
 
   describe("Transfer fighter and ERC721 functions", function() {
     it("Transfer figher to another address", async function () {
       //owner should have one fighter and addr1 should have 0
-      expect( await hardhatFighter.balanceOf(owner.address)).to.equal(1);
-      expect( await hardhatFighter.connect(addr1).balanceOf(addr1.address)).to.equal(0);
-      hardhatFighter.transferFighter(addr1.address, 0);
+      expect( await hardhatFighter.balanceOf(owner.address, 1)).to.equal(1);
+      expect( await hardhatFighter.connect(addr1).balanceOf(addr1.address, 1)).to.equal(0);
+      hardhatFighter.transferFighter(addr1.address, 1);
       //owner transfered his fighter to addr1 so owner should have 0 fighter and addr1 should have 1.
-      expect( await hardhatFighter.balanceOf(owner.address)).to.equal(0);
-      expect( await hardhatFighter.connect(addr1).balanceOf(addr1.address)).to.equal(1);
+      expect( await hardhatFighter.balanceOf(owner.address, 1)).to.equal(0);
+      expect( await hardhatFighter.connect(addr1).balanceOf(addr1.address, 1)).to.equal(1);
     });
 
     it("Addr1 should not be able to transfer fighter because not the owner", async function() {
-      expect( hardhatFighter.connect(addr1).transferFighter(owner.address, 0)).to.be.revertedWith("Not the rightfull owner of this fighter");
+      expect( hardhatFighter.connect(addr1).transferFighter(owner.address, 1)).to.be.revertedWith("Not the rightfull owner of this fighter");
     });
   });
 });
