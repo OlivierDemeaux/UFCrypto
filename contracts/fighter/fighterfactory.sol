@@ -12,9 +12,10 @@ contract FighterFactory is Ownable, ERC1155 {
     using Counters for Counters.Counter;
 
     //Id of the next NFT to mint
-    Counters.Counter private _fighterCounter;
+    Counters.Counter private _tokenCounter;
 
     uint256 public constant FGHT = 0;
+    uint256 public constant GYMS = 1;
     uint16 public cooldownTime = uint16(5 hours);
     enum pro_status {hopeful, amateur, semiPro, professional, retired }
 
@@ -36,9 +37,14 @@ contract FighterFactory is Ownable, ERC1155 {
         pro_status status;
     }
 
+
+    //todo: sort the mess that is the mappings/fightersId and tokenId for erc1155
+
+
     mapping (uint256 => Fighter) public fighters;
-    mapping (uint256 => address) public fighterIdToOwner;
+    // mapping (uint256 => address) public fighterIdToOwner;
     mapping (address => uint) public numberFighterOwned;
+    // mapping (uint256 => )
 
     // Optional mapping for token URIs
     mapping (uint256 => string) private _tokenURIs;
@@ -47,9 +53,14 @@ contract FighterFactory is Ownable, ERC1155 {
     
     event NewFighter(uint fighterId, string name, uint style);
 
-    constructor() ERC1155("https://gateway.pinata.cloud/ipfs/QmbU522KoakHNjMxE8qdR2gyP4cR5SBytkjVURsEeHQuAK/{id}.json") {
-        _mint(msg.sender, _fighterCounter.current(), 10**18, "");
-        _fighterCounter.increment();
+    constructor() ERC1155("https://gateway.pinata.cloud/ipfs/QmWahmPksR4XPVHSwP2RnkpxcaNWEg5KjTjSmEcseTKd5U/{id}.json") {
+        //base token FGHT
+        _mint(msg.sender, FGHT, 10**18, "");
+        //Gyms. 
+        _mint(msg.sender, GYMS, 50, "");
+        _tokenCounter.increment();
+        _tokenCounter.increment();
+
         // Preset default stats starting.
         //Will look for a more efficient way of doing this.
         //Starting with wrestler, theb bjj, boxing, striking, and balanced.
@@ -63,11 +74,11 @@ contract FighterFactory is Ownable, ERC1155 {
 
     function createFighter(string memory _name, uint8 _style) public returns(bool) {
         require(numberFighterOwned[msg.sender] < 10, "one owner can have max 10 fighters");
-        uint _fighterId = _fighterCounter.current();
+        uint _fighterId = _tokenCounter.current();
         fighters[_fighterId] = Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, _fighterId, selectedStyle[_style], [0,0,0,0,0,0], false, pro_status.hopeful);
         // fighters.push(Fighter(_name, 170, 18, 1, _style, 0, block.timestamp, fighterId, selectedStyle[_style], [0,0,0,0,0,0], false, pro_status.hopeful));
         _mint(msg.sender, _fighterId, 1, "");
-        _fighterCounter.increment();
+        _tokenCounter.increment();
         numberFighterOwned[msg.sender] += 1;
 
         return(true);
@@ -75,7 +86,7 @@ contract FighterFactory is Ownable, ERC1155 {
 
     function getFighterURI(uint _fighterId) public pure returns(string memory) {
         return(string(abi.encodePacked(
-            "https://gateway.pinata.cloud/ipfs/QmbU522KoakHNjMxE8qdR2gyP4cR5SBytkjVURsEeHQuAK/",
+            "https://gateway.pinata.cloud/ipfs/QmWahmPksR4XPVHSwP2RnkpxcaNWEg5KjTjSmEcseTKd5U/",
             Strings.toString(_fighterId),
             ".json"
             ))
