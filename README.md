@@ -11,3 +11,5 @@ Still is just an idea that I had, of making a fun crypto/blockchain game, where 
 
 Truth be told, I'm doing this to improve my coding skills while having fun and working on something that I want to work on.
  Don't know where this will lead
+
+ Changing the fighter creation from an ERC721 to a ERC1155 standar to learn more about it and improve the creation of fighter, gyms and money inside the game.
