@@ -56,9 +56,9 @@ contract FighterFactory is Ownable, ERC1155 {
     constructor() ERC1155("https://gateway.pinata.cloud/ipfs/QmWahmPksR4XPVHSwP2RnkpxcaNWEg5KjTjSmEcseTKd5U/{id}.json") {
         //base token FGHT
         _mint(msg.sender, FGHT, 10**18, "");
+        _tokenCounter.increment();
         //Gyms. 
         _mint(msg.sender, GYMS, 50, "");
-        _tokenCounter.increment();
         _tokenCounter.increment();
 
         // Preset default stats starting.
